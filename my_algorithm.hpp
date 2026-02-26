@@ -8,10 +8,10 @@ int rand_int(int l, int r) { // [l, r)
     return std::uniform_int_distribution<int>(l, r - 1)(gen);
 }
 
-double rand_double(double l, double r) {
+double rand_double(double l = 0, double r = 1) {
     return std::uniform_real_distribution<double>(l, r)(gen);
 }
 
-int rand_bool(double k) {
+int rand_bool(double k = 0.5) {
     return std::bernoulli_distribution(k)(gen);
 }

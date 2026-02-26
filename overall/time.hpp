@@ -6,4 +6,4 @@ static double __time = 0;
 
 double time() { return __time; }
 
-double next_time() { return ++__time; }
+double next_time() { return (__time += min_dt); }

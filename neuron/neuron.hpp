@@ -35,6 +35,8 @@ struct Neuron {
         void get_bap();
         void t_run();
 
+        
+
     };
 
     struct Axon {
@@ -61,14 +63,19 @@ struct Neuron {
 
     Dendrite *build_a_den(int pre_type);
 
+    double sp_t; // 最近一次爆发
+
     Neuron() { 
         ax.from = this; 
+        sp_t = -0.1;
     }
     
 };
 
 double Neuron::Dendrite::Ca_f(double x) { // 1 ms 为单位
-    return x < 0.1 ? 0 : 0.006 * (x - 0.1) * (x - 0.8) / (x * x + 0.3);
+    if (x < 0.1) return 0;
+    else if (x > 0.8) return 0.006 * (x - 0.1) * (x - 0.8) / (x * x + 0.3);
+    else return 0.008 * (x - 0.1) * (x - 0.8) / (x * x + 0.3); // 削弱幅度更大一点
 }
 
 Neuron::Dendrite::Dendrite(double l, double r) { 
@@ -93,9 +100,9 @@ void Neuron::Dendrite::t_run() {              // 随时间 min_dt 的自然损�
     w += (min_dt * Neuron::Dendrite::Ca_f(Ca_v)) * (min_dt * DA.f());
 
     if (link->from->type() == 1) {            // 突触前神经元是兴奋性
-        w = std::max(std::min(w, 2.0), 0.0);
+        w = std::max(std::min(w, 3.0), 0.0);
     } else {                                  // 突触前神经元是抑制性
-        w = std::max(std::min(w, 0.0), -2.0);
+        w = std::max(std::min(w, 0.0), -3.0);
     }
 }
 
@@ -122,7 +129,8 @@ void Neuron::Axon::release() {
 }
 
 void Neuron::release() {
-    // printf("sp!\n");
+    sp_t = time();
+    printf("%lf  sp!\n", time());
 
     ax.release();
     for (Dendrite &d : den) d.get_bap();

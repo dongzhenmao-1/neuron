@@ -1,13 +1,11 @@
 #pragma once
 
-#include "const_v.hpp"
+#include "time.hpp"
 
 struct __DA { // umol
     double __v, I;
 
     double rest() { return 0.05; }
-
-    __DA() : __v(rest()) {}
 
     void float_v(double k) { 
         I += 0.045 * k;
