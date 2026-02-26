@@ -11,3 +11,7 @@ int rand_int(int l, int r) { // [l, r)
 double rand_double(double l, double r) {
     return std::uniform_real_distribution<double>(l, r)(gen);
 }
+
+int rand_bool(double k) {
+    return std::bernoulli_distribution(k)(gen);
+}
