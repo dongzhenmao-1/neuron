@@ -4,7 +4,7 @@
 int main() {
     double a = 0.02;
     double b = 0.2;
-    double c = -67.0;
+    double c = -67.01;
     double d = 8.0;
 
     double v = -67.0;  
