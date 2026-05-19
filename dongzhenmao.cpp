@@ -3,9 +3,6 @@
 #include <math.h>
 
 #include "neuron/brain.hpp"
-#include "my_algorithm.hpp"
-
-Brain brain;
 
 int main() {
     brain.build();

@@ -1,3 +1,3 @@
 #pragma once
 
-const int max_n = 100; // 神经元数量
+const int edge_length = 100; 
