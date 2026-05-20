@@ -25,21 +25,59 @@ namespace mtd {
     template<typename tnt> struct point2 {
         tnt x, y;
     };
-
     template<typename tnt>
     bool operator <(const point2<tnt> &a, const point2<tnt> &b) {
         return a.x == b.x ? a.y < b.y : a.x < b.x;
+    }
+    template<typename tnt>
+    bool operator ==(const point2<tnt> &a, const point2<tnt> &b) {
+        return a.x == b.x && a.y == b.y;
     }
 
     template<typename tnt> struct point3 {
         tnt x, y, z;
     };
-
     template<typename tnt>
     bool operator <(const point3<tnt> &a, const point3<tnt> &b) {
         return a.x == b.x ? (a.y == b.y ? a.z < b.z : a.y < b.y) : a.x < b.x;
     }
+    template<typename tnt>
+    bool operator ==(const point3<tnt> &a, const point3<tnt> &b) {
+        return a.x == b.x && a.y == b.y && a.z == b.z;
+    }
+
 }
+
+#include <unordered_map>
+
+namespace std {
+    struct hash<mtd::point2<int>> {
+        size_t operator()(const mtd::point2<int> &p) const {
+            size_t hx = std::hash<int>{}(p.x);
+            size_t hy = std::hash<int>{}(p.y);
+            size_t seed = 0;
+            seed ^= hx + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hy + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+            return seed;
+        }
+    };
+
+    struct hash<mtd::point3<int>> {
+        size_t operator()(const mtd::point3<int> &p) const {
+            size_t hx = std::hash<int>{}(p.x);
+            size_t hy = std::hash<int>{}(p.y);
+            size_t hz = std::hash<int>{}(p.z);
+            size_t seed = 0;
+            seed ^= hx + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hy + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hz + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+            return seed;
+        }
+    };
+}
+
 
 #include <random>
 
@@ -57,6 +95,13 @@ namespace mtd {
         return std::uniform_int_distribution<int>(l, r - 1)(gen);
     }
 
+    point2<int> rand_int_point2(int lim) {
+        return {rand_int(0, lim), rand_int(0, lim)};
+    }
+    point3<int> rand_int_point3(int lim) {
+        return {rand_int(0, lim), rand_int(0, lim), rand_int(0, lim)};
+    }
+
 }
 
 namespace mtd {
@@ -69,4 +114,11 @@ namespace mtd {
 
     using exint = extnt<int>;
     using exdouble = extnt<double>;
+}
+
+#include <list>
+
+namespace mtd {
+   
+    
 }
