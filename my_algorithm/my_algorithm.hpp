@@ -33,6 +33,10 @@ namespace mtd {
     bool operator ==(const point2<tnt> &a, const point2<tnt> &b) {
         return a.x == b.x && a.y == b.y;
     }
+    template<typename tnt>
+    point2<tnt> operator +(const point2<tnt> &a, const point2<tnt> &b) {
+        return point2<tnt>{a.x + b.x, a.y + b.y, a.z + b.z};
+    }   
 
     template<typename tnt> struct point3 {
         tnt x, y, z;
@@ -45,6 +49,10 @@ namespace mtd {
     bool operator ==(const point3<tnt> &a, const point3<tnt> &b) {
         return a.x == b.x && a.y == b.y && a.z == b.z;
     }
+    template<typename tnt>
+    point3<tnt> operator +(const point3<tnt> &a, const point3<tnt> &b) {
+        return point3<tnt>{a.x + b.x, a.y + b.y, a.z + b.z};
+    }   
 
 }
 
@@ -110,6 +118,7 @@ namespace mtd {
         tnt &v() { return _v; }
         tnt &lv() { return _lv;}
         void bp() { _lv = _v; }
+        extnt(double f = 0) _v(f) {}
     };
 
     using exint = extnt<int>;

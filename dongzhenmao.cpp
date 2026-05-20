@@ -2,21 +2,21 @@
 #include <vector> 
 #include <math.h>
 
-#include "neuron/brain.hpp"
+我想实现类似下面的功能
+
+struct A {
+    int a;
+    struct B {
+        int b;
+        void fuc() {
+            // 我想在这里访问 a 的值
+        }
+    };
+};
+
 
 int main() {
-    brain.build();
-
-    for (int i = 0; i < 2000; ++i) {
-        int x = rand_bool(), y = rand_bool();
-        int z = x ^ y;
-        for ( ; ; next_time()) {
-            brain.get_input(std::vector<double>{double(x), double(y)});
-            
-            brain.t_run();
-        }
-
-    }
+    
 
     
     return 0;
