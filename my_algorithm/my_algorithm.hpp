@@ -2,16 +2,17 @@
 
 namespace mtd {
     const double e = 2.7182818;
-    // const double ie5 = 1.221403;
-    // const double ie7 = 1.153565;
-    const double ie10 = 1.105171;
+    // const double esqrt5 = 1.221403;
+    // const double esqrt7 = 1.153565;
+    const double esqrt10 = 1.105171;
+    const double iesqrt10 = 1 / esqrt10;
     const double pi = 3.1415927;
 
     inline const std::array<double, 100> _iexp10 = []() {
         std::array<double, 100> arr;
         arr[0] = 1;
         for (int i = 1; i < 100; ++i) 
-            arr[i] = arr[i - 1] / ie10;
+            arr[i] = arr[i - 1] * iesqrt10;
         return arr;
     }();
 
@@ -35,7 +36,7 @@ namespace mtd {
     }
     template<typename tnt>
     point2<tnt> operator +(const point2<tnt> &a, const point2<tnt> &b) {
-        return point2<tnt>{a.x + b.x, a.y + b.y, a.z + b.z};
+        return point2<tnt>{a.x + b.x, a.y + b.y};
     }   
 
     template<typename tnt> struct point3 {
@@ -103,11 +104,11 @@ namespace mtd {
         return std::uniform_int_distribution<int>(l, r - 1)(gen);
     }
 
-    point2<int> rand_int_point2(int lim) {
-        return {rand_int(0, lim), rand_int(0, lim)};
+    point2<int> rand_int_point2(int l, int r) {
+        return {rand_int(l, r), rand_int(l, r)};
     }
-    point3<int> rand_int_point3(int lim) {
-        return {rand_int(0, lim), rand_int(0, lim), rand_int(0, lim)};
+    point3<int> rand_int_point3(int l, int r) {
+        return {rand_int(l, r), rand_int(l, r), rand_int(l, r)};
     }
 
 }
@@ -118,7 +119,7 @@ namespace mtd {
         tnt &v() { return _v; }
         tnt &lv() { return _lv;}
         void bp() { _lv = _v; }
-        extnt(double f = 0) _v(f) {}
+        extnt(double f = 0) : _v(f), _lv(f) {}
     };
 
     using exint = extnt<int>;
