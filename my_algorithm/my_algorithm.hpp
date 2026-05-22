@@ -17,6 +17,7 @@ namespace mtd {
     }();
 
     double iexp10(int x) {
+        if (x < 0) return 0;
         return x >= 100 ? 0 : _iexp10[x];
     }
 

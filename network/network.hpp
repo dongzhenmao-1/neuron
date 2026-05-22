@@ -14,6 +14,8 @@ namespace mtd {
 
     struct axon {
         std::list<synapse*> syn;
+        std::list<std::pair<neuron*, double>> da_target;
+
         neuron *nrn;
 
         void release();
@@ -34,7 +36,6 @@ namespace mtd {
         void run() { pw.v() *= 0.9891; } // 
 
         void get_pulse();
-        void get_da_pulse(double w);
         void get_bap();
 
         synapse(neuron *_nrn, axon *_ax, double _w) : nrn(_nrn), ax(_ax), w(_w), pw(0) {
@@ -51,6 +52,8 @@ namespace mtd {
     };
 
     struct neuron {
+        std::list<int> rtime;
+
         network *outer;
 
         point3<int> pos;
@@ -69,6 +72,7 @@ namespace mtd {
         
         void release() { 
             t.v() = outer->time(), ax.release(); 
+            rtime.push_back(outer->time());
             for (synapse &_syn : syn) _syn.get_bap();
         }
 
@@ -78,12 +82,19 @@ namespace mtd {
         }
 
         void run() {
+            if (!rtime.empty() && rtime.front() < outer->time() - 50) {
+                rtime.pop_front();
+            }
             v.v() *= 0.91;
             for (synapse &_syn : syn) _syn.run();
 
             if (v.lv() > 1) { // more function will come soon
                 v.v() -= 1, release();
             }
+        }
+
+        double get_val() {
+            return double(rtime.size()) / 5.0;
         }
 
         synapse *add_synapse(axon *from_ax, double w) {
@@ -114,8 +125,9 @@ namespace mtd {
         if (nrn->macro_t == macro_type::positive || nrn->macro_t == macro_type::negative) {
             for (synapse *_syn : syn) _syn->get_pulse();
         } else {
-            for (synapse *_syn : syn) 
-                _syn->get_da_pulse(nrn->macro_t == macro_type::positive_da ? 1 : -1);
+            for (auto _nrn : da_target) {
+                _nrn.first->get_da(_nrn.second);
+            }
         }
     }
 
@@ -131,7 +143,14 @@ namespace mtd {
 
     void synapse::get_bap() {
         const double B = 0.1; // weakening constant
+        macro_type pre = this->ax->nrn->macro_t;
+        if (pre == macro_type::positive_da || pre == macro_type::negative_da) return;
         pw.v() += mtd::iexp10(nrn->t.v() - ax->nrn->t.lv()) - B;
+        if (pre == macro_type::positive) {
+            pw.v() = std::max(0.0, std::min(1.0, pw.v()));
+        } else {
+            pw.v() = std::max(-1.0, std::min(0.0, pw.v()));
+        }
     }
 
     struct gene {
@@ -161,6 +180,10 @@ namespace mtd {
         static const int n = 10, max_nrn = n * n * n / 3;
         static const int max_edge = n * 2; // keep the space for neuron 
 
+        static const int input_size = 2, reward_size = 2, output_size = 1; // reward means "reward and punishment"
+
+        double input[input_size], reward[reward_size];
+
         std::list<gene> gen;
         std::list<neuron> nrn;
         std::unordered_map<int, neuron*> itnrn; // id to neuron
@@ -168,9 +191,9 @@ namespace mtd {
 
         bool is_exist_neuron(point3<int> pos);
 
+        neuron *create_neuron_phenotype(point3<int> pos, int id, macro_type type, int atype);
         void build();
 
-        neuron *create_neuron(point3<int> pos, int id, macro_type type, int atype);
         bool create_neuron_normal();
         bool create_edge_normal();
         bool delete_neuron_normal();
@@ -181,7 +204,12 @@ namespace mtd {
 
         int _time = 0;
         int &time() { return _time; }
+        void next_time() { ++time(); }
         void run();
+
+        void network::set_special_input(int id, double w);
+        void network::set_special_reward(int id, double w);
+        double network::get_special_output(int id);
 
     };
 
@@ -189,44 +217,49 @@ namespace mtd {
         return (ptnrn.find(pos) != ptnrn.end());
     }
 
-    void synapse::get_da_pulse(double da) {
-        for (int dx = -2; dx <= 2; ++dx) {
-            for (int dy = -2; dy <= 2; ++dy) {
-                for (int dz = -2; dz <= 2; ++dz) {
-                    point3<int> pos = nrn->pos + (point3<int>){dx, dy, dz};
-                    if (nrn->outer->is_exist_neuron(pos)) {
-                        double _da = da;
-                        if (dx == 0 && dy == 0 && dz == 0) { _da *= 0.8; }
-                        else if (abs(dx) <= 1 && abs(dy) <= 1 && abs(dz) <= 1) { _da *= 0.6; }
-                        else if (abs(dx) <= 2 && abs(dy) <= 2 && abs(dz) <= 2) { _da *= 0.4; }
-                        (nrn->outer->ptnrn[pos])->get_da(_da);
-                    }
-                }
-            }
-        }
-    }
-
-    void network::build() { // you can only use this network after you call this function.
-        for (const gene &_gen : gen) {
-            if (_gen.type == 0) {
-                create_neuron(_gen.neuron.pos, _gen.neuron.id, _gen.neuron.macro_t, _gen.neuron.atype);
-            } else if (_gen.type == 1) {
-                itnrn[_gen.edge.edge.x]->link(itnrn[_gen.edge.edge.y], _gen.edge.w);
-            }
-        }
-    }
-
-    neuron *network::create_neuron(point3<int> pos, int id, macro_type type, int atype) {
+    neuron *network::create_neuron_phenotype(point3<int> pos, int id, macro_type type, int atype) {
         nrn.push_back(neuron(this, pos, id, type, atype));
         itnrn[id] = &nrn.back();
         ptnrn[pos] = &nrn.back();
         return &nrn.back();
     }
 
-    bool network::create_neuron_normal() {
+    void network::build() { // you can only use this network after you call this function.
+        for (const gene &_gen : gen) {
+            if (_gen.type == 0) {
+                create_neuron_phenotype(_gen.neuron.pos, _gen.neuron.id, _gen.neuron.macro_t, _gen.neuron.atype);
+            } else if (_gen.type == 1) {
+                itnrn[_gen.edge.edge.x]->link(itnrn[_gen.edge.edge.y], _gen.edge.w);
+            }
+        }
+
+        for (neuron &_nrn : nrn) if (_nrn.macro_t == macro_type::positive_da || _nrn.macro_t == macro_type::negative_da) {
+            double da = (_nrn.macro_t == macro_type::positive_da ? 1.0 : -1.0);
+            for (int dx = -2; dx <= 2; ++dx) {
+                for (int dy = -2; dy <= 2; ++dy) {
+                    for (int dz = -2; dz <= 2; ++dz) {
+                        point3<int> pos = _nrn.pos + (point3<int>){dx, dy, dz};
+                        if (is_exist_neuron(pos)) {
+                            double _da = da;
+                            if (dx == 0 && dy == 0 && dz == 0) { _da *= 0.8; }
+                            else if (abs(dx) <= 1 && abs(dy) <= 1 && abs(dz) <= 1) { _da *= 0.6; }
+                            else if (abs(dx) <= 2 && abs(dy) <= 2 && abs(dz) <= 2) { _da *= 0.4; }
+                            _nrn.ax.da_target.push_back({ptnrn[pos], _da});
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    bool network::create_neuron_normal() { // more function will coming soon
         point3<int> pos = rand_int_point3(0, n);
         if (is_exist_neuron(pos)) return false;
-        create_neuron(pos, nrn.size(), macro_type(rand_int(0, 4)), 0); // more function will coming soon
+        gene ngen;
+        ngen.type = 0;
+        ngen.neuron = {pos, int(nrn.size()), macro_type(rand_int(0, 4)), 0};
+        gen.push_back(ngen);
+
         return true;
     }
 
@@ -329,11 +362,38 @@ namespace mtd {
         return new_network;
     }
 
+    /*
+    special section id order
+    input
+    reward/punishment
+    output
+    */
+
+    void network::set_special_input(int id, double w) {
+        input[id] = w;
+    }
+
+    void network::set_special_reward(int id, double w) {
+        reward[id] = w;
+    }
+
+    double network::get_special_output(int id) {
+        return itnrn[input_size + reward_size + id]->get_val();
+    }
+
+
     void network::run() {
-        for ( ; ; ++time()) {
-            for (neuron &_nrn : nrn) _nrn.bp();
-            for (neuron &_nrn : nrn) _nrn.run();
+        for (int i = 0; i < input_size; ++i) {
+            itnrn[i]->v.v() += (input[i] * 0.05 + 0.09);
         }
+        for (int i = 0; i < reward_size; ++i) {
+            itnrn[i + input_size]->v.v() += (reward[i] * 0.05 + 0.09);
+        }
+
+        for (neuron &_nrn : nrn) _nrn.bp();
+        for (neuron &_nrn : nrn) _nrn.run();
+        
+        ++time();
     }
 
 
