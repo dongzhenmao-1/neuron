@@ -1,11 +1,21 @@
 #pragma once
 
-#include <list>
-#include <unordered_map>
-#include <unordered_set>
+#include "network.hpp"
 
-namespace mtd {
+namespace Dtd {
+    struct Test {
 
+
+        void build() {
+            for (int i = 0; i < 10; ++i) {
+
+            }
+        }
+
+
+
+
+    };
 
 
 

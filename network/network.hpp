@@ -115,7 +115,7 @@ namespace mtd {
         }
 
         neuron(network *_outer, point3<int> _pos, int _id, macro_type _macro_t, int _atype) : 
-            outer(_outer), pos(_pos), id(_id), macro_t(_macro_t), ax(this), atype(_atype) {
+            outer(_outer), pos(_pos), id(_id), macro_t(_macro_t), ax(this), atype(_atype), t(-100.0), v(0) {
             
         }
 
@@ -250,6 +250,7 @@ namespace mtd {
                 }
             }
         }
+
     }
 
     bool network::create_neuron_normal() { // more function will coming soon
