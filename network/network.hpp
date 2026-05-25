@@ -153,14 +153,15 @@ namespace mtd {
         }
     }
 
+    /*
+        0 create neuron
+        1 create edge
+        * 2 delete neuron
+        * 3 delete edge
+        * 4 move neuron
+    */
     struct gene {
-        int type; /*
-            0 create neuron
-            1 create edge
-            * 2 delete neuron
-            * 3 delete edge
-            * 4 move neuron
-        */
+        int type; 
         union {
             struct {
                 point3<int> pos;
@@ -168,12 +169,27 @@ namespace mtd {
                 macro_type macro_t;
                 int atype;
             } neuron;
+
             struct {
                 point2<int> edge;
                 int atype;
                 double w;
             } edge;
+
         };
+
+        static gene create_neuron(point3<int> pos, int id, macro_type macro_t, int atype) {
+            gene ngen;
+            ngen.type = 0, ngen.neuron = {pos, id, macro_t, 0};
+            return ngen;
+        }
+
+        static gene create_edge(point2<int> edge, int atype, double w) {
+            gene ngen; 
+            ngen.type = 1, ngen.edge = {edge, atype, 0.0};
+            return ngen;
+        }
+
     };
 
     struct network {
@@ -193,6 +209,9 @@ namespace mtd {
 
         neuron *create_neuron_phenotype(point3<int> pos, int id, macro_type type, int atype);
         void build();
+
+        void create_neuron(point3<int> pos, int id, macro_type macro_t, int atype);
+        void create_edge(point2<int> edge, int atype, double w);
 
         bool create_neuron_normal();
         bool create_edge_normal();
@@ -253,14 +272,18 @@ namespace mtd {
 
     }
 
+    void network::create_neuron(point3<int> pos, int id, macro_type macro_t, int atype) {
+        gen.push_back(gene::create_neuron(pos, id, macro_t, atype));        
+    }
+
+    void network::create_edge(point2<int> edge, int atype, double w) {
+        gen.push_back(gene::create_edge(edge, atype, w));
+    }
+
     bool network::create_neuron_normal() { // more function will coming soon
         point3<int> pos = rand_int_point3(0, n);
         if (is_exist_neuron(pos)) return false;
-        gene ngen;
-        ngen.type = 0;
-        ngen.neuron = {pos, int(nrn.size()), macro_type(rand_int(0, 4)), 0};
-        gen.push_back(ngen);
-
+        create_neuron(pos, int(nrn.size()), macro_type(rand_int(0, 4)), 0);
         return true;
     }
 
@@ -275,16 +298,11 @@ namespace mtd {
         if (itnrn[edge.x]->ax.syn.size() >= max_edge) return false;
         if (itnrn[edge.x]->is_link(itnrn[edge.y])) return false;
 
-        gene ngen; 
-        ngen.type = 1, ngen.edge = {edge, rand_int(0, 1), 0.0};
-
         if (itnrn[edge.x]->macro_t == macro_type::positive) {
-            ngen.edge.w = rand_double(0.2, 0.8);
+            create_edge(edge, rand_int(0, 1), rand_double(0.2, 0.8));
         } else if (itnrn[edge.x]->macro_t == macro_type::negative) {
-            ngen.edge.w = rand_double(-0.8, 0.2);
+            create_edge(edge, rand_int(0, 1), rand_double(-0.8, 0.2));
         }
-
-        gen.push_back(ngen);
 
         return true;
     }
