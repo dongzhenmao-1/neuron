@@ -1,0 +1,1726 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+# File Summary
+
+## Purpose
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+
+## File Format
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  a. A header with the file path (## File: path/to/file)
+  b. The full contents of the file in a code block
+
+## Usage Guidelines
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+
+## Notes
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+
+# Directory Structure
+```
+.gitignore
+doc/set.md
+dongzhenmao.cpp
+my_algorithm/my_algorithm.hpp
+network/NEAT.hpp
+network/network.hpp
+README.md
+repomix-output.xml
+run.bat
+```
+
+# Files
+
+## File: README.md
+```markdown
+你好呀
+![](https://github.com/dongzhenmao/photo/blob/main/photo/4ybxo0yq.png?raw=true)
+```
+
+## File: run.bat
+```batch
+g++ dongzhenmao.cpp -o dongzhenmao.exe -std=c++14
+dongzhenmao
+pause
+```
+
+## File: .gitignore
+```
+*.exe
+```
+
+## File: repomix-output.xml
+```xml
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+doc/set.md
+dongzhenmao.cpp
+my_algorithm/my_algorithm.hpp
+network/NEAT.hpp
+network/network.hpp
+README.md
+run.bat
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="README.md">
+你好呀
+![](https://github.com/dongzhenmao/photo/blob/main/photo/4ybxo0yq.png?raw=true)
+</file>
+
+<file path="run.bat">
+g++ dongzhenmao.cpp -o dongzhenmao.exe -std=c++14
+dongzhenmao
+pause
+</file>
+
+<file path=".gitignore">
+*.exe
+</file>
+
+<file path="network/NEAT.hpp">
+#pragma once
+
+#include "network.hpp"
+
+namespace mtd {
+    struct Test {
+        std::list<gene> orig_gene = {
+            gene::create_neuron({0, 2, 2}, 0, neuron::macro_type::positive, -1),
+            gene::create_neuron({0, 7, 2}, 1, neuron::macro_type::positive, -1),
+            gene::create_neuron({0, 2, 7}, 2, neuron::macro_type::positive, -1),
+            gene::create_neuron({0, 7, 7}, 3, neuron::macro_type::positive, -1),
+            gene::create_neuron({9, 5, 5}, 4, neuron::macro_type::positive, -1),
+        };
+        
+        network net[25];
+
+        void init() {
+            for (int i = 0; i < 5; ++i) {
+                net[i].gen = orig_gene;
+            }
+        }
+
+        void mutate() {
+            std::sort(net, net + 25, [](const network &a, const network &b) {
+                return a.score > b.score;
+            });
+
+            network new_net[25];
+
+            for (int i = 0; i < 5; ++i) {
+                for (int e = 0; e < 5; ++e) {
+                    new_net[i * 5 + e] = net[i].mutate();
+                }
+            }
+
+            std::swap(net, new_net);
+
+            for (network &_net : net) {
+                _net.build();
+                _net.score = 0;
+                _net.cnt = 0;
+                _net.ok_time = 300;
+            }
+        }
+    
+        int i0, i1, o0;
+
+        void create_example() {
+            i0 = rand_bool(), i1 = rand_bool();
+            o0 = i0 ^ i1;
+        }
+
+        void run0() {
+            for (int i = 0; i < 300; ++i) {
+                mutate();
+                run1();
+            }
+        }
+
+        void run1() {
+            for (int step = 0; step < 300; ++step) {
+                run2(step >= 100);
+                if (step > 200) {
+                    for (network &_net : net) {
+                        if (_net.cnt / (step - 99) > 0.8) {
+                            _net.ok_time = std::min(step, _net.ok_time);
+                        }
+                    }
+                }
+            }
+
+            for (network &_net : net) {
+                _net.score = 0.5 * _net.cnt / 200 + 0.5 * (1 - (_net.ok_time - 200) / 100.0);
+            }
+        }
+
+        void run2(double is_in) {
+            create_example();
+            for (int step = 0; step < 150; ++step) {
+                for (network &_net : net) {
+                    _net.set_special_input(0, i0);
+                    _net.set_special_input(1, i1);
+                    if (step > 100) {
+                        int _o0 = _net.get_special_output(0);
+                        if (abs(_o0 - o0) < 0.5) {
+                            _net.set_special_input(2, 1);
+                            _net.set_special_input(3, 0);
+                            _net.cnt += is_in * 1.0 / 50;
+                        } else {
+                            _net.set_special_input(2, 0);
+                            _net.set_special_input(3, 1);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+</file>
+
+<file path="doc/set.md">
+## 综述
+
+我想改进一下朴素的 SNN，搭配 NEAT 使用。
+
+考虑真实的情况，每时每刻的强化与弱化由当时的 $Ca^{2+}$ 与受体结合率与多巴胺浓度共同作用。
+
+首先，常见地，我们将 $Ca^{2+}$ 与受体结合率整合为 "资格迹"，多巴胺全局作用然后归零资格迹，但这明显偏离生物太远，不仅是违反了多巴胺不影响 $Ca^{2+}$ 与受体结合率的事实，而且无法真正解决信用分配的问题（当然，我们不否认在浅层网络他是有用的）。
+
+所以说，我们换一个改法。
+
+重新定义资格迹（这通常比原来定义的弱化许多），在突触后神经元发放时计算：
+
+在后神经元发放时：
+
+$$
+W = k_1 \times W' + k_2\times e^{-\Delta t} - b
+$$
+
+否则：
+
+$$
+W = k_1 \times W'
+$$
+
+一些解释：b 代表的是 LTD，前面代表的是 LTP。模拟一下就会发现和传统的正负 \Delta t 差不多。
+
+
+
+加入独立的多巴胺神经元，为了计算简便（相当于提前对影响做一个不准确的积分），我们对于每一个的多巴胺神经元的每次发放，我们都进行一次计算：
+
+$$
+w \gets w + W \times D
+$$
+
+$D$ 是多巴胺强度。
+
+关于多巴胺神经元同样进行连边。每次计算，释放多巴胺（在突触后神经元位置）范围 5 * 5 * 5, 中心 3 * 3 * 3 比外圈大。这个范围内神经元的所有树突使用上述公式修正。
+
+我们同时设立一种新的神经元，这个神经元专门在的得到奖赏时获得电压（不考虑电流），根据奖赏强弱来给予。
+
+关于 NEAT 的 fitness 函数，设学习后正确率 $k$，设最大学习次数为 $m$。
+
+进行 $n$ 次学习后从第一次开始正确率第一次到达 $90\%$ 的次数 $t$（若没达到则是 $m$）。
+
+设学习最快的次数是 $q$。
+
+则 $f() = \alpha \times k + (1 - \alpha) \times (1 - \dfrac{n}{m})$，越大适应度越高。
+
+所有的神经元都遵循演化。
+
+## 神经元设计
+
+### 神经元种类
+
+常态神经元：
+- 多巴胺神经元：包括正常的和反常的（反常的神经元释放反的多巴胺强度。即使这有悖常理，但是也可以看成是我们对多巴胺浓度海平面的调整）
+- 神经元：抑制和激发
+
+特殊神经元：
+- 输入输出神经元（预先给定）
+- 奖赏神经元（多个，这里设计成 3 个，更多能更精确的调整奖赏节点）
+
+## NEAT
+
+仅使用变异，放弃交叉操作（我们毕竟主要进化结构）
+
+操作：
+
+- 加点 1：创建 A
+- 加边 2：A B 变为 A->B
+- 删边：A->B 变为 A B
+- 删点：删除所有有关此点的边还有点，不可删除的节点为特殊节点（输入输出与奖赏节点）
+- 移动：在不超出边界的情况下移动一个节点到相邻的空间。
+
+所有操作在变异时实现。
+
+前两个操作还要用于构建
+
+## 以后
+
+显然这份代码中很多东西都可以优化（访问时计算来实现 SNN 的优点），但更显然的是我累了，所以以后再搞
+
+## 嗯
+</file>
+
+<file path="dongzhenmao.cpp">
+#include <stdio.h>
+#include <vector> 
+#include <math.h>
+
+
+
+int main() {
+    
+
+    
+    return 0;
+}
+
+/*
+
+
+*/
+</file>
+
+<file path="my_algorithm/my_algorithm.hpp">
+#include <array>
+
+namespace mtd {
+    const double e = 2.7182818;
+    // const double esqrt5 = 1.221403;
+    // const double esqrt7 = 1.153565;
+    const double esqrt10 = 1.105171;
+    const double iesqrt10 = 1 / esqrt10;
+    const double pi = 3.1415927;
+
+    inline const std::array<double, 100> _iexp10 = []() {
+        std::array<double, 100> arr;
+        arr[0] = 1;
+        for (int i = 1; i < 100; ++i) 
+            arr[i] = arr[i - 1] * iesqrt10;
+        return arr;
+    }();
+
+    double iexp10(int x) {
+        if (x < 0) return 0;
+        return x >= 100 ? 0 : _iexp10[x];
+    }
+
+}
+
+namespace mtd { 
+    template<typename tnt> struct point2 {
+        tnt x, y;
+    };
+    template<typename tnt>
+    bool operator <(const point2<tnt> &a, const point2<tnt> &b) {
+        return a.x == b.x ? a.y < b.y : a.x < b.x;
+    }
+    template<typename tnt>
+    bool operator ==(const point2<tnt> &a, const point2<tnt> &b) {
+        return a.x == b.x && a.y == b.y;
+    }
+    template<typename tnt>
+    point2<tnt> operator +(const point2<tnt> &a, const point2<tnt> &b) {
+        return point2<tnt>{a.x + b.x, a.y + b.y};
+    }   
+
+    template<typename tnt> struct point3 {
+        tnt x, y, z;
+    };
+    template<typename tnt>
+    bool operator <(const point3<tnt> &a, const point3<tnt> &b) {
+        return a.x == b.x ? (a.y == b.y ? a.z < b.z : a.y < b.y) : a.x < b.x;
+    }
+    template<typename tnt>
+    bool operator ==(const point3<tnt> &a, const point3<tnt> &b) {
+        return a.x == b.x && a.y == b.y && a.z == b.z;
+    }
+    template<typename tnt>
+    point3<tnt> operator +(const point3<tnt> &a, const point3<tnt> &b) {
+        return point3<tnt>{a.x + b.x, a.y + b.y, a.z + b.z};
+    }   
+
+}
+
+#include <unordered_map>
+
+namespace std {
+    struct hash<mtd::point2<int>> {
+        size_t operator()(const mtd::point2<int> &p) const {
+            size_t hx = std::hash<int>{}(p.x);
+            size_t hy = std::hash<int>{}(p.y);
+            size_t seed = 0;
+            seed ^= hx + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hy + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+            return seed;
+        }
+    };
+
+    struct hash<mtd::point3<int>> {
+        size_t operator()(const mtd::point3<int> &p) const {
+            size_t hx = std::hash<int>{}(p.x);
+            size_t hy = std::hash<int>{}(p.y);
+            size_t hz = std::hash<int>{}(p.z);
+            size_t seed = 0;
+            seed ^= hx + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hy + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hz + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+            return seed;
+        }
+    };
+}
+
+
+#include <random>
+
+namespace mtd {
+    std::random_device rand;
+    std::mt19937 gen(rand());
+
+    bool rand_bool(double k = 0.5) {
+        return std::bernoulli_distribution(k)(gen);
+    }
+    double rand_double(double l, double r) { // [l, r)
+        return std::uniform_real_distribution<double>(l, r)(gen);
+    }
+    int rand_int(int l, int r) { // [l, r)
+        return std::uniform_int_distribution<int>(l, r - 1)(gen);
+    }
+
+    point2<int> rand_int_point2(int l, int r) {
+        return {rand_int(l, r), rand_int(l, r)};
+    }
+    point3<int> rand_int_point3(int l, int r) {
+        return {rand_int(l, r), rand_int(l, r), rand_int(l, r)};
+    }
+
+}
+
+namespace mtd {
+    template<typename tnt> struct extnt {
+        tnt _v, _lv;
+        tnt &v() { return _v; }
+        tnt &lv() { return _lv;}
+        void bp() { _lv = _v; }
+        extnt(double f = 0) : _v(f), _lv(f) {}
+    };
+
+    using exint = extnt<int>;
+    using exdouble = extnt<double>;
+}
+
+#include <list>
+
+namespace mtd {
+   
+    
+}
+</file>
+
+<file path="network/network.hpp">
+#pragma once
+
+#include "../my_algorithm/my_algorithm.hpp"
+#include <list>
+#include <unordered_set>
+#include <unordered_map>
+#include <algorithm>
+
+namespace mtd {
+    struct network;
+    struct neuron;
+    struct axon;
+    struct synapse;
+
+    struct axon {
+        std::list<synapse*> syn;
+        std::list<std::pair<neuron*, double>> da_target;
+
+        neuron *nrn;
+
+        void release();
+
+        axon(neuron *_nrn) : nrn(_nrn) {
+            
+        }
+    };
+
+    struct synapse {
+        int atype; // 
+
+        exdouble w, pw; // w, potential weight
+        axon *ax;
+        neuron *nrn;
+
+        void bp() { w.bp(), pw.bp(); } // 
+        void run() { pw.v() *= 0.9891; } // 
+
+        void get_pulse();
+        void get_bap();
+
+        synapse(neuron *_nrn, axon *_ax, double _w) : nrn(_nrn), ax(_ax), w(_w), pw(0) {
+
+        }
+
+    };
+
+    struct neuron {
+        enum class macro_type {
+            positive,
+            negative,
+            positive_da,
+            negative_da,
+        };
+
+        std::list<int> rtime;
+
+        network *outer;
+
+        point3<int> pos;
+        int id;
+
+        macro_type macro_t;
+        int atype; // additonal type, if val < 0, this is a special neuron
+
+        exdouble v;
+        exint t;
+
+        std::list<synapse> syn;
+        axon ax;
+
+        void get_da(double w);
+        
+        void release() { 
+            t.v() = outer->time(), ax.release(); 
+            rtime.push_back(outer->time());
+            for (synapse &_syn : syn) _syn.get_bap();
+        }
+
+        void bp() {
+            t.bp(), v.bp();
+            for (synapse &_syn : syn) _syn.bp();
+        }
+
+        void run() {
+            if (!rtime.empty() && rtime.front() < outer->time() - 50) {
+                rtime.pop_front();
+            }
+            v.v() *= 0.91;
+            for (synapse &_syn : syn) _syn.run();
+
+            if (v.lv() > 1) { // more function will come soon
+                v.v() -= 1, release();
+            }
+        }
+
+        double get_val() {
+            return double(rtime.size()) / 5.0;
+        }
+
+        synapse *add_synapse(axon *from_ax, double w) {
+            syn.push_back(synapse(this, from_ax, w));
+            return &syn.back();
+        }
+
+        void link(neuron *post, double w) {
+            synapse *_syn = post->add_synapse(&this->ax, w);
+            ax.syn.push_back(_syn);
+        }
+
+        bool is_link(neuron *post) {
+            for (synapse *_syn : ax.syn) {
+                if (_syn->nrn == post) return true;
+            }
+            return false;
+        }
+
+        neuron(network *_outer, point3<int> _pos, int _id, macro_type _macro_t, int _atype) : 
+            outer(_outer), pos(_pos), id(_id), macro_t(_macro_t), ax(this), atype(_atype), t(-100.0), v(0) {
+            
+        }
+
+    };
+
+    void axon::release() {
+        if (nrn->macro_t == neuron::macro_type::positive || nrn->macro_t == neuron::macro_type::negative) {
+            for (synapse *_syn : syn) _syn->get_pulse();
+        } else {
+            for (auto _nrn : da_target) {
+                _nrn.first->get_da(_nrn.second);
+            }
+        }
+    }
+
+    void synapse::get_pulse() {
+        nrn->v.v() += w.lv();
+    }
+
+    void neuron::get_da(double _da) {
+        for (synapse &_syn : syn) {
+            _syn.w.v() += _syn.pw.lv() * _da;
+        }
+    }
+
+    void synapse::get_bap() {
+        const double B = 0.1; // weakening constant
+        neuron::macro_type pre = this->ax->nrn->macro_t;
+        if (pre == neuron::macro_type::positive_da || pre == neuron::macro_type::negative_da) return;
+        pw.v() += mtd::iexp10(nrn->t.v() - ax->nrn->t.lv()) - B;
+        if (pre == neuron::macro_type::positive) {
+            pw.v() = std::max(0.0, std::min(1.0, pw.v()));
+        } else {
+            pw.v() = std::max(-1.0, std::min(0.0, pw.v()));
+        }
+    }
+
+    /*
+        0 create neuron
+        1 create edge
+        * 2 delete neuron
+        * 3 delete edge
+        * 4 move neuron
+    */
+    struct gene {
+        int type; 
+        union {
+            struct {
+                point3<int> pos;
+                int id;
+                neuron::macro_type macro_t;
+                int atype;
+            } neuron;
+
+            struct {
+                point2<int> edge;
+                int atype;
+                double w;
+            } edge;
+
+        };
+
+        static gene create_neuron(point3<int> pos, int id, neuron::macro_type macro_t, int atype) {
+            gene ngen;
+            ngen.type = 0, ngen.neuron = {pos, id, macro_t, 0};
+            return ngen;
+        }
+
+        static gene create_edge(point2<int> edge, int atype, double w) {
+            gene ngen; 
+            ngen.type = 1, ngen.edge = {edge, atype, 0.0};
+            return ngen;
+        }
+
+    };
+
+    struct network {
+        double score;
+        double cnt;
+        int ok_time;
+
+        static const int n = 10, max_nrn = n * n * n / 5;
+        static const int max_edge = n * 3; // keep the space for neuron 
+
+        static const int input_size = 4, output_size = 1; // reward means "reward and punishment"
+
+        double input[input_size];
+
+        std::list<gene> gen;
+        std::list<neuron> nrn;
+        std::unordered_map<int, neuron*> itnrn; // id to neuron
+        std::unordered_map<mtd::point3<int>, neuron*> ptnrn; // pos to neuron
+
+        bool is_exist_neuron(point3<int> pos);
+
+        neuron *create_neuron_phenotype(point3<int> pos, int id, neuron::macro_type type, int atype);
+        void build();
+
+        void create_neuron(point3<int> pos, int id, neuron::macro_type macro_t, int atype);
+        void create_edge(point2<int> edge, int atype, double w);
+
+        bool create_neuron_normal();
+        bool create_edge_normal();
+        bool delete_neuron_normal();
+        bool delete_edge_normal();
+        bool change_property_normal();
+
+        network mutate();
+
+        int _time = 0;
+        int &time() { return _time; }
+        void next_time() { ++time(); }
+        void run();
+
+        void network::set_special_input(int id, double w);
+        double network::get_special_output(int id);
+
+        // network(std::list<gene> _gen) : gen(_gen) {
+
+        // }
+
+    };
+
+    bool network::is_exist_neuron(point3<int> pos) {
+        return (ptnrn.find(pos) != ptnrn.end());
+    }
+
+    neuron *network::create_neuron_phenotype(point3<int> pos, int id, neuron::macro_type type, int atype) {
+        nrn.push_back(neuron(this, pos, id, type, atype));
+        itnrn[id] = &nrn.back();
+        ptnrn[pos] = &nrn.back();
+        return &nrn.back();
+    }
+
+    void network::build() { // you can only use this network after you call this function.
+        for (const gene &_gen : gen) {
+            if (_gen.type == 0) {
+                create_neuron_phenotype(_gen.neuron.pos, _gen.neuron.id, _gen.neuron.macro_t, _gen.neuron.atype);
+            } else if (_gen.type == 1) {
+                itnrn[_gen.edge.edge.x]->link(itnrn[_gen.edge.edge.y], _gen.edge.w);
+            }
+        }
+
+        for (neuron &_nrn : nrn) if (_nrn.macro_t == neuron::macro_type::positive_da || 
+            _nrn.macro_t == neuron::macro_type::negative_da) {
+            double da = (_nrn.macro_t == neuron::macro_type::positive_da ? 1.0 : -1.0);
+            for (int dx = -2; dx <= 2; ++dx) {
+                for (int dy = -2; dy <= 2; ++dy) {
+                    for (int dz = -2; dz <= 2; ++dz) {
+                        point3<int> pos = _nrn.pos + (point3<int>){dx, dy, dz};
+                        if (is_exist_neuron(pos)) {
+                            double _da = da;
+                            if (dx == 0 && dy == 0 && dz == 0) { _da *= 0.8; }
+                            else if (abs(dx) <= 1 && abs(dy) <= 1 && abs(dz) <= 1) { _da *= 0.6; }
+                            else if (abs(dx) <= 2 && abs(dy) <= 2 && abs(dz) <= 2) { _da *= 0.4; }
+                            _nrn.ax.da_target.push_back({ptnrn[pos], _da});
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    void network::create_neuron(point3<int> pos, int id, neuron::macro_type macro_t, int atype) {
+        gen.push_back(gene::create_neuron(pos, id, macro_t, atype));        
+    }
+
+    void network::create_edge(point2<int> edge, int atype, double w) {
+        gen.push_back(gene::create_edge(edge, atype, w));
+    }
+
+    bool network::create_neuron_normal() { // more function will coming soon
+        point3<int> pos = rand_int_point3(0, n);
+        if (is_exist_neuron(pos)) return false;
+        create_neuron(pos, int(nrn.size()), neuron::macro_type(rand_int(0, 4)), 0);
+        return true;
+    }
+
+    bool network::create_edge_normal() {
+        std::unordered_set<point2<int>> mp;
+        for (const gene &_gen : gen) {
+            if (_gen.type == 1) mp.insert({_gen.edge.edge.x, _gen.edge.edge.y});
+        }
+
+        point2<int> edge = rand_int_point2(0, nrn.size());
+        if (mp.find(edge) != mp.end()) return false;
+        if (itnrn[edge.x]->ax.syn.size() >= max_edge) return false;
+        if (itnrn[edge.x]->is_link(itnrn[edge.y])) return false;
+
+        if (itnrn[edge.x]->macro_t == neuron::macro_type::positive) {
+            create_edge(edge, rand_int(0, 1), rand_double(0.2, 0.8));
+        } else if (itnrn[edge.x]->macro_t == neuron::macro_type::negative) {
+            create_edge(edge, rand_int(0, 1), rand_double(-0.8, 0.2));
+        }
+
+        return true;
+    }
+
+    bool network::delete_neuron_normal() {
+        int id = rand_int(0, nrn.size());
+        if (itnrn[id]->atype < 0) return false; // special
+
+        for (auto it = gen.begin(); it != gen.end(); ) {
+            auto nx = std::next(it);
+            if (it->type == 0) {
+                if (it->neuron.id == id) gen.erase(it);
+                else it->neuron.id -= (it->neuron.id > id);
+            } else if (it->type == 1) {
+                if (it->edge.edge.x == id || it->edge.edge.y == id) gen.erase(it);
+                else it->edge.edge.x -= (it->edge.edge.x > id), it->edge.edge.y -= (it->edge.edge.y > id);
+            }
+            it = nx;
+        }
+
+        return true;
+    }
+
+    bool network::delete_edge_normal() {
+        int cnt = 0;
+        for (const gene &_gen : gen) cnt += (_gen.type == 1);
+        if (cnt == 0) return false;
+        cnt = rand_int(0, cnt);
+        for (auto it = gen.begin(); it != gen.end(); ) {
+            auto nx = std::next(it);
+            cnt -= (it->type == 1);
+            if (cnt == 0) gen.erase(it);
+            it = nx;
+        }    
+
+        return true;
+    }
+
+    bool network::change_property_normal() {
+        int id = rand_int(0, nrn.size());
+        point3<int> npos = itnrn[id]->pos + rand_int_point3(-2, 3);
+        if (is_exist_neuron(npos)) return false;
+        if (npos.x < 0 || npos.y < 0 || npos.z < 0) return false;
+        if (npos.x >= n || npos.y >= n || npos.z >= n) return false;
+
+        for (gene &_gen : gen) if (_gen.type == 0 && _gen.neuron.id == id) {
+            _gen.neuron.pos = npos; 
+            break;
+        }
+
+        return true;
+    }
+
+    network network::mutate() {
+        network new_network;
+        new_network.gen = this->gen;
+
+        for (int flag = 0, change_t = rand_int(0, 4); !flag; change_t = rand_int(0, 5)) {
+            if (change_t == 0) {
+                flag = create_neuron_normal();
+            } else if (change_t == 1) {
+                flag = create_edge_normal() ;
+            } else if (change_t == 2) {
+                flag = delete_neuron_normal();
+            } else if (change_t == 3) {
+                flag = delete_edge_normal();
+            } else if (change_t == 4) {
+                flag = change_property_normal();
+            }
+        }
+
+        for (gene &_gen : gen) if (_gen.type == 1 && rand_bool(0.1)) {
+            _gen.edge.w *= rand_double(0.95, 1.05);
+        }
+
+        std::swap(new_network.gen, this->gen);
+
+        return new_network;
+    }
+
+    /*
+    special section id order
+    input
+    reward/punishment
+    output
+    */
+
+    void network::set_special_input(int id, double w) {
+        input[id] = w;
+    }
+
+    double network::get_special_output(int id) {
+        return itnrn[input_size + id]->get_val();
+    }
+
+
+    void network::run() {
+        for (int i = 0; i < input_size; ++i) {
+            itnrn[i]->v.v() += (input[i] * 0.05 + 0.09); // 0.09 is the limit at which it will not explode.
+        }
+
+        for (neuron &_nrn : nrn) _nrn.bp();
+        for (neuron &_nrn : nrn) _nrn.run();
+        
+        ++time();
+    }
+
+
+
+}
+</file>
+
+</files>
+```
+
+## File: network/NEAT.hpp
+```cpp
+#pragma once
+
+#include "network.hpp"
+
+namespace mtd {
+    struct Test {
+        std::list<gene> orig_gene = {
+            gene::create_neuron({0, 2, 2}, 0, neuron::macro_type::positive, -1),
+            gene::create_neuron({0, 7, 2}, 1, neuron::macro_type::positive, -1),
+            gene::create_neuron({0, 2, 7}, 2, neuron::macro_type::positive, -1),
+            gene::create_neuron({0, 7, 7}, 3, neuron::macro_type::positive, -1),
+            gene::create_neuron({9, 5, 5}, 4, neuron::macro_type::positive, -1),
+        };
+        
+        network net[25];
+
+        void init() {
+            for (int i = 0; i < 5; ++i) {
+                net[i].gen = orig_gene;
+            }
+        }
+
+        void mutate() {
+            std::sort(net, net + 25, [](const network &a, const network &b) {
+                return a.score > b.score;
+            });
+
+            network new_net[25];
+
+            for (int i = 0; i < 5; ++i) {
+                for (int e = 0; e < 5; ++e) {
+                    new_net[i * 5 + e] = net[i].mutate();
+                }
+            }
+
+            std::swap(net, new_net);
+
+            for (network &_net : net) {
+                _net.build();
+                _net.score = 0;
+                _net.cnt = 0;
+                _net.ok_time = 300;
+            }
+        }
+    
+        int i0, i1, o0;
+
+        void create_example() {
+            i0 = rand_bool(), i1 = rand_bool();
+            o0 = i0 ^ i1;
+        }
+
+        void run0() {
+            for (int i = 0; i < 300; ++i) {
+                mutate();
+                run1();
+            }
+        }
+
+        void run1() {
+            for (int step = 0; step < 300; ++step) {
+                run2(step >= 100);
+                if (step > 200) {
+                    for (network &_net : net) {
+                        if (_net.cnt / (step - 99) > 0.8) {
+                            _net.ok_time = std::min(step, _net.ok_time);
+                        }
+                    }
+                }
+            }
+
+            for (network &_net : net) {
+                _net.score = 0.5 * _net.cnt / 200 + 0.5 * (1 - (_net.ok_time - 200) / 100.0);
+            }
+        }
+
+        void run2(double is_in) {
+            create_example();
+            for (int step = 0; step < 150; ++step) {
+                for (network &_net : net) {
+                    _net.set_special_input(0, i0);
+                    _net.set_special_input(1, i1);
+                    if (step > 100) {
+                        int _o0 = _net.get_special_output(0);
+                        if (abs(_o0 - o0) < 0.5) {
+                            _net.set_special_input(2, 1);
+                            _net.set_special_input(3, 0);
+                            _net.cnt += is_in * 1.0 / 50;
+                        } else {
+                            _net.set_special_input(2, 0);
+                            _net.set_special_input(3, 1);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+```
+
+## File: doc/set.md
+```markdown
+## 综述
+
+我想改进一下朴素的 SNN，搭配 NEAT 使用。
+
+考虑真实的情况，每时每刻的强化与弱化由当时的 $Ca^{2+}$ 与受体结合率与多巴胺浓度共同作用。
+
+首先，常见地，我们将 $Ca^{2+}$ 与受体结合率整合为 "资格迹"，多巴胺全局作用然后归零资格迹，但这明显偏离生物太远，不仅是违反了多巴胺不影响 $Ca^{2+}$ 与受体结合率的事实，而且无法真正解决信用分配的问题（当然，我们不否认在浅层网络他是有用的）。
+
+所以说，我们换一个改法。
+
+重新定义资格迹（这通常比原来定义的弱化许多），在突触后神经元发放时计算：
+
+在后神经元发放时：
+
+$$
+W = k_1 \times W' + k_2\times e^{-\Delta t} - b
+$$
+
+否则：
+
+$$
+W = k_1 \times W'
+$$
+
+一些解释：b 代表的是 LTD，前面代表的是 LTP。模拟一下就会发现和传统的正负 \Delta t 差不多。
+
+
+
+加入独立的多巴胺神经元，为了计算简便（相当于提前对影响做一个不准确的积分），我们对于每一个的多巴胺神经元的每次发放，我们都进行一次计算：
+
+$$
+w \gets w + W \times D
+$$
+
+$D$ 是多巴胺强度。
+
+关于多巴胺神经元同样进行连边。每次计算，释放多巴胺（在突触后神经元位置）范围 5 * 5 * 5, 中心 3 * 3 * 3 比外圈大。这个范围内神经元的所有树突使用上述公式修正。
+
+我们同时设立一种新的神经元，这个神经元专门在的得到奖赏时获得电压（不考虑电流），根据奖赏强弱来给予。
+
+关于 NEAT 的 fitness 函数，设学习后正确率 $k$，设最大学习次数为 $m$。
+
+进行 $n$ 次学习后从第一次开始正确率第一次到达 $90\%$ 的次数 $t$（若没达到则是 $m$）。
+
+设学习最快的次数是 $q$。
+
+则 $f() = \alpha \times k + (1 - \alpha) \times (1 - \dfrac{n}{m})$，越大适应度越高。
+
+所有的神经元都遵循演化。
+
+## 神经元设计
+
+### 神经元种类
+
+常态神经元：
+- 多巴胺神经元：包括正常的和反常的（反常的神经元释放反的多巴胺强度。即使这有悖常理，但是也可以看成是我们对多巴胺浓度海平面的调整）
+- 神经元：抑制和激发
+
+特殊神经元：
+- 输入输出神经元（预先给定）
+- 奖赏神经元（多个，这里设计成 3 个，更多能更精确的调整奖赏节点）
+
+## NEAT
+
+仅使用变异，放弃交叉操作（我们毕竟主要进化结构）
+
+操作：
+
+- 加点 1：创建 A
+- 加边 2：A B 变为 A->B
+- 删边：A->B 变为 A B
+- 删点：删除所有有关此点的边还有点，不可删除的节点为特殊节点（输入输出与奖赏节点）
+- 移动：在不超出边界的情况下移动一个节点到相邻的空间。
+
+所有操作在变异时实现。
+
+前两个操作还要用于构建
+
+## 以后
+
+显然这份代码中很多东西都可以优化（访问时计算来实现 SNN 的优点），但更显然的是我累了，所以以后再搞
+
+## 嗯
+```
+
+## File: dongzhenmao.cpp
+```cpp
+#include <stdio.h>
+#include <vector> 
+#include <math.h>
+
+
+
+int main() {
+    
+
+    
+    return 0;
+}
+
+/*
+
+
+*/
+```
+
+## File: my_algorithm/my_algorithm.hpp
+```cpp
+#include <array>
+
+namespace mtd {
+    const double e = 2.7182818;
+    // const double esqrt5 = 1.221403;
+    // const double esqrt7 = 1.153565;
+    const double esqrt10 = 1.105171;
+    const double iesqrt10 = 1 / esqrt10;
+    const double pi = 3.1415927;
+
+    inline const std::array<double, 100> _iexp10 = []() {
+        std::array<double, 100> arr;
+        arr[0] = 1;
+        for (int i = 1; i < 100; ++i) 
+            arr[i] = arr[i - 1] * iesqrt10;
+        return arr;
+    }();
+
+    double iexp10(int x) {
+        if (x < 0) return 0;
+        return x >= 100 ? 0 : _iexp10[x];
+    }
+
+}
+
+namespace mtd { 
+    template<typename tnt> struct point2 {
+        tnt x, y;
+    };
+    template<typename tnt>
+    bool operator <(const point2<tnt> &a, const point2<tnt> &b) {
+        return a.x == b.x ? a.y < b.y : a.x < b.x;
+    }
+    template<typename tnt>
+    bool operator ==(const point2<tnt> &a, const point2<tnt> &b) {
+        return a.x == b.x && a.y == b.y;
+    }
+    template<typename tnt>
+    point2<tnt> operator +(const point2<tnt> &a, const point2<tnt> &b) {
+        return point2<tnt>{a.x + b.x, a.y + b.y};
+    }   
+
+    template<typename tnt> struct point3 {
+        tnt x, y, z;
+    };
+    template<typename tnt>
+    bool operator <(const point3<tnt> &a, const point3<tnt> &b) {
+        return a.x == b.x ? (a.y == b.y ? a.z < b.z : a.y < b.y) : a.x < b.x;
+    }
+    template<typename tnt>
+    bool operator ==(const point3<tnt> &a, const point3<tnt> &b) {
+        return a.x == b.x && a.y == b.y && a.z == b.z;
+    }
+    template<typename tnt>
+    point3<tnt> operator +(const point3<tnt> &a, const point3<tnt> &b) {
+        return point3<tnt>{a.x + b.x, a.y + b.y, a.z + b.z};
+    }   
+
+}
+
+#include <unordered_map>
+
+namespace std {
+    struct hash<mtd::point2<int>> {
+        size_t operator()(const mtd::point2<int> &p) const {
+            size_t hx = std::hash<int>{}(p.x);
+            size_t hy = std::hash<int>{}(p.y);
+            size_t seed = 0;
+            seed ^= hx + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hy + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+            return seed;
+        }
+    };
+
+    struct hash<mtd::point3<int>> {
+        size_t operator()(const mtd::point3<int> &p) const {
+            size_t hx = std::hash<int>{}(p.x);
+            size_t hy = std::hash<int>{}(p.y);
+            size_t hz = std::hash<int>{}(p.z);
+            size_t seed = 0;
+            seed ^= hx + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hy + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= hz + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+            return seed;
+        }
+    };
+}
+
+
+#include <random>
+
+namespace mtd {
+    std::random_device rand;
+    std::mt19937 gen(rand());
+
+    bool rand_bool(double k = 0.5) {
+        return std::bernoulli_distribution(k)(gen);
+    }
+    double rand_double(double l, double r) { // [l, r)
+        return std::uniform_real_distribution<double>(l, r)(gen);
+    }
+    int rand_int(int l, int r) { // [l, r)
+        return std::uniform_int_distribution<int>(l, r - 1)(gen);
+    }
+
+    point2<int> rand_int_point2(int l, int r) {
+        return {rand_int(l, r), rand_int(l, r)};
+    }
+    point3<int> rand_int_point3(int l, int r) {
+        return {rand_int(l, r), rand_int(l, r), rand_int(l, r)};
+    }
+
+}
+
+namespace mtd {
+    template<typename tnt> struct extnt {
+        tnt _v, _lv;
+        tnt &v() { return _v; }
+        tnt &lv() { return _lv;}
+        void bp() { _lv = _v; }
+        extnt(double f = 0) : _v(f), _lv(f) {}
+    };
+
+    using exint = extnt<int>;
+    using exdouble = extnt<double>;
+}
+
+#include <list>
+
+namespace mtd {
+   
+    
+}
+```
+
+## File: network/network.hpp
+```cpp
+#pragma once
+
+#include "../my_algorithm/my_algorithm.hpp"
+#include <list>
+#include <unordered_set>
+#include <unordered_map>
+#include <algorithm>
+
+namespace mtd {
+    struct network;
+    struct neuron;
+    struct axon;
+    struct synapse;
+
+    struct axon {
+        std::list<synapse*> syn;
+        std::list<std::pair<neuron*, double>> da_target;
+
+        neuron *nrn;
+
+        void release();
+
+        axon(neuron *_nrn) : nrn(_nrn) {
+            
+        }
+    };
+
+    struct synapse {
+        int atype; // 
+
+        exdouble w, pw; // w, potential weight
+        axon *ax;
+        neuron *nrn;
+
+        void bp() { w.bp(), pw.bp(); } // 
+        void run() { pw.v() *= 0.9891; } // 
+
+        void get_pulse();
+        void get_bap();
+
+        synapse(neuron *_nrn, axon *_ax, double _w) : nrn(_nrn), ax(_ax), w(_w), pw(0) {
+
+        }
+
+    };
+
+    struct neuron {
+        enum class macro_type {
+            positive,
+            negative,
+            positive_da,
+            negative_da,
+        };
+
+        std::list<int> rtime;
+
+        network *outer;
+
+        point3<int> pos;
+        int id;
+
+        macro_type macro_t;
+        int atype; // additonal type, if val < 0, this is a special neuron
+
+        exdouble v;
+        exint t;
+
+        std::list<synapse> syn;
+        axon ax;
+
+        void get_da(double w);
+        
+        void release() { 
+            t.v() = outer->time(), ax.release(); 
+            rtime.push_back(outer->time());
+            for (synapse &_syn : syn) _syn.get_bap();
+        }
+
+        void bp() {
+            t.bp(), v.bp();
+            for (synapse &_syn : syn) _syn.bp();
+        }
+
+        void run() {
+            if (!rtime.empty() && rtime.front() < outer->time() - 50) {
+                rtime.pop_front();
+            }
+            v.v() *= 0.91;
+            for (synapse &_syn : syn) _syn.run();
+
+            if (v.lv() > 1) { // more function will come soon
+                v.v() -= 1, release();
+            }
+        }
+
+        double get_val() {
+            return double(rtime.size()) / 5.0;
+        }
+
+        synapse *add_synapse(axon *from_ax, double w) {
+            syn.push_back(synapse(this, from_ax, w));
+            return &syn.back();
+        }
+
+        void link(neuron *post, double w) {
+            synapse *_syn = post->add_synapse(&this->ax, w);
+            ax.syn.push_back(_syn);
+        }
+
+        bool is_link(neuron *post) {
+            for (synapse *_syn : ax.syn) {
+                if (_syn->nrn == post) return true;
+            }
+            return false;
+        }
+
+        neuron(network *_outer, point3<int> _pos, int _id, macro_type _macro_t, int _atype) : 
+            outer(_outer), pos(_pos), id(_id), macro_t(_macro_t), ax(this), atype(_atype), t(-100.0), v(0) {
+            
+        }
+
+    };
+
+    void axon::release() {
+        if (nrn->macro_t == neuron::macro_type::positive || nrn->macro_t == neuron::macro_type::negative) {
+            for (synapse *_syn : syn) _syn->get_pulse();
+        } else {
+            for (auto _nrn : da_target) {
+                _nrn.first->get_da(_nrn.second);
+            }
+        }
+    }
+
+    void synapse::get_pulse() {
+        nrn->v.v() += w.lv();
+    }
+
+    void neuron::get_da(double _da) {
+        for (synapse &_syn : syn) {
+            _syn.w.v() += _syn.pw.lv() * _da;
+        }
+    }
+
+    void synapse::get_bap() {
+        const double B = 0.1; // weakening constant
+        neuron::macro_type pre = this->ax->nrn->macro_t;
+        if (pre == neuron::macro_type::positive_da || pre == neuron::macro_type::negative_da) return;
+        pw.v() += mtd::iexp10(nrn->t.v() - ax->nrn->t.lv()) - B;
+        if (pre == neuron::macro_type::positive) {
+            pw.v() = std::max(0.0, std::min(1.0, pw.v()));
+        } else {
+            pw.v() = std::max(-1.0, std::min(0.0, pw.v()));
+        }
+    }
+
+    /*
+        0 create neuron
+        1 create edge
+        * 2 delete neuron
+        * 3 delete edge
+        * 4 move neuron
+    */
+    struct gene {
+        int type; 
+        union {
+            struct {
+                point3<int> pos;
+                int id;
+                neuron::macro_type macro_t;
+                int atype;
+            } neuron;
+
+            struct {
+                point2<int> edge;
+                int atype;
+                double w;
+            } edge;
+
+        };
+
+        static gene create_neuron(point3<int> pos, int id, neuron::macro_type macro_t, int atype) {
+            gene ngen;
+            ngen.type = 0, ngen.neuron = {pos, id, macro_t, 0};
+            return ngen;
+        }
+
+        static gene create_edge(point2<int> edge, int atype, double w) {
+            gene ngen; 
+            ngen.type = 1, ngen.edge = {edge, atype, 0.0};
+            return ngen;
+        }
+
+    };
+
+    struct network {
+        double score;
+        double cnt;
+        int ok_time;
+
+        static const int n = 10, max_nrn = n * n * n / 5;
+        static const int max_edge = n * 3; // keep the space for neuron 
+
+        static const int input_size = 4, output_size = 1; // reward means "reward and punishment"
+
+        double input[input_size];
+
+        std::list<gene> gen;
+        std::list<neuron> nrn;
+        std::unordered_map<int, neuron*> itnrn; // id to neuron
+        std::unordered_map<mtd::point3<int>, neuron*> ptnrn; // pos to neuron
+
+        bool is_exist_neuron(point3<int> pos);
+
+        neuron *create_neuron_phenotype(point3<int> pos, int id, neuron::macro_type type, int atype);
+        void build();
+
+        void create_neuron(point3<int> pos, int id, neuron::macro_type macro_t, int atype);
+        void create_edge(point2<int> edge, int atype, double w);
+
+        bool create_neuron_normal();
+        bool create_edge_normal();
+        bool delete_neuron_normal();
+        bool delete_edge_normal();
+        bool change_property_normal();
+
+        network mutate();
+
+        int _time = 0;
+        int &time() { return _time; }
+        void next_time() { ++time(); }
+        void run();
+
+        void network::set_special_input(int id, double w);
+        double network::get_special_output(int id);
+
+        // network(std::list<gene> _gen) : gen(_gen) {
+
+        // }
+
+    };
+
+    bool network::is_exist_neuron(point3<int> pos) {
+        return (ptnrn.find(pos) != ptnrn.end());
+    }
+
+    neuron *network::create_neuron_phenotype(point3<int> pos, int id, neuron::macro_type type, int atype) {
+        nrn.push_back(neuron(this, pos, id, type, atype));
+        itnrn[id] = &nrn.back();
+        ptnrn[pos] = &nrn.back();
+        return &nrn.back();
+    }
+
+    void network::build() { // you can only use this network after you call this function.
+        for (const gene &_gen : gen) {
+            if (_gen.type == 0) {
+                create_neuron_phenotype(_gen.neuron.pos, _gen.neuron.id, _gen.neuron.macro_t, _gen.neuron.atype);
+            } else if (_gen.type == 1) {
+                itnrn[_gen.edge.edge.x]->link(itnrn[_gen.edge.edge.y], _gen.edge.w);
+            }
+        }
+
+        for (neuron &_nrn : nrn) if (_nrn.macro_t == neuron::macro_type::positive_da || 
+            _nrn.macro_t == neuron::macro_type::negative_da) {
+            double da = (_nrn.macro_t == neuron::macro_type::positive_da ? 1.0 : -1.0);
+            for (int dx = -2; dx <= 2; ++dx) {
+                for (int dy = -2; dy <= 2; ++dy) {
+                    for (int dz = -2; dz <= 2; ++dz) {
+                        point3<int> pos = _nrn.pos + (point3<int>){dx, dy, dz};
+                        if (is_exist_neuron(pos)) {
+                            double _da = da;
+                            if (dx == 0 && dy == 0 && dz == 0) { _da *= 0.8; }
+                            else if (abs(dx) <= 1 && abs(dy) <= 1 && abs(dz) <= 1) { _da *= 0.6; }
+                            else if (abs(dx) <= 2 && abs(dy) <= 2 && abs(dz) <= 2) { _da *= 0.4; }
+                            _nrn.ax.da_target.push_back({ptnrn[pos], _da});
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    void network::create_neuron(point3<int> pos, int id, neuron::macro_type macro_t, int atype) {
+        gen.push_back(gene::create_neuron(pos, id, macro_t, atype));        
+    }
+
+    void network::create_edge(point2<int> edge, int atype, double w) {
+        gen.push_back(gene::create_edge(edge, atype, w));
+    }
+
+    bool network::create_neuron_normal() { // more function will coming soon
+        point3<int> pos = rand_int_point3(0, n);
+        if (is_exist_neuron(pos)) return false;
+        create_neuron(pos, int(nrn.size()), neuron::macro_type(rand_int(0, 4)), 0);
+        return true;
+    }
+
+    bool network::create_edge_normal() {
+        std::unordered_set<point2<int>> mp;
+        for (const gene &_gen : gen) {
+            if (_gen.type == 1) mp.insert({_gen.edge.edge.x, _gen.edge.edge.y});
+        }
+
+        point2<int> edge = rand_int_point2(0, nrn.size());
+        if (mp.find(edge) != mp.end()) return false;
+        if (itnrn[edge.x]->ax.syn.size() >= max_edge) return false;
+        if (itnrn[edge.x]->is_link(itnrn[edge.y])) return false;
+
+        if (itnrn[edge.x]->macro_t == neuron::macro_type::positive) {
+            create_edge(edge, rand_int(0, 1), rand_double(0.2, 0.8));
+        } else if (itnrn[edge.x]->macro_t == neuron::macro_type::negative) {
+            create_edge(edge, rand_int(0, 1), rand_double(-0.8, 0.2));
+        }
+
+        return true;
+    }
+
+    bool network::delete_neuron_normal() {
+        int id = rand_int(0, nrn.size());
+        if (itnrn[id]->atype < 0) return false; // special
+
+        for (auto it = gen.begin(); it != gen.end(); ) {
+            auto nx = std::next(it);
+            if (it->type == 0) {
+                if (it->neuron.id == id) gen.erase(it);
+                else it->neuron.id -= (it->neuron.id > id);
+            } else if (it->type == 1) {
+                if (it->edge.edge.x == id || it->edge.edge.y == id) gen.erase(it);
+                else it->edge.edge.x -= (it->edge.edge.x > id), it->edge.edge.y -= (it->edge.edge.y > id);
+            }
+            it = nx;
+        }
+
+        return true;
+    }
+
+    bool network::delete_edge_normal() {
+        int cnt = 0;
+        for (const gene &_gen : gen) cnt += (_gen.type == 1);
+        if (cnt == 0) return false;
+        cnt = rand_int(0, cnt);
+        for (auto it = gen.begin(); it != gen.end(); ) {
+            auto nx = std::next(it);
+            cnt -= (it->type == 1);
+            if (cnt == 0) gen.erase(it);
+            it = nx;
+        }    
+
+        return true;
+    }
+
+    bool network::change_property_normal() {
+        int id = rand_int(0, nrn.size());
+        point3<int> npos = itnrn[id]->pos + rand_int_point3(-2, 3);
+        if (is_exist_neuron(npos)) return false;
+        if (npos.x < 0 || npos.y < 0 || npos.z < 0) return false;
+        if (npos.x >= n || npos.y >= n || npos.z >= n) return false;
+
+        for (gene &_gen : gen) if (_gen.type == 0 && _gen.neuron.id == id) {
+            _gen.neuron.pos = npos; 
+            break;
+        }
+
+        return true;
+    }
+
+    network network::mutate() {
+        network new_network;
+        new_network.gen = this->gen;
+
+        for (int flag = 0, change_t = rand_int(0, 4); !flag; change_t = rand_int(0, 5)) {
+            if (change_t == 0) {
+                flag = create_neuron_normal();
+            } else if (change_t == 1) {
+                flag = create_edge_normal() ;
+            } else if (change_t == 2) {
+                flag = delete_neuron_normal();
+            } else if (change_t == 3) {
+                flag = delete_edge_normal();
+            } else if (change_t == 4) {
+                flag = change_property_normal();
+            }
+        }
+
+        for (gene &_gen : gen) if (_gen.type == 1 && rand_bool(0.1)) {
+            _gen.edge.w *= rand_double(0.95, 1.05);
+        }
+
+        std::swap(new_network.gen, this->gen);
+
+        return new_network;
+    }
+
+    /*
+    special section id order
+    input
+    reward/punishment
+    output
+    */
+
+    void network::set_special_input(int id, double w) {
+        input[id] = w;
+    }
+
+    double network::get_special_output(int id) {
+        return itnrn[input_size + id]->get_val();
+    }
+
+
+    void network::run() {
+        for (int i = 0; i < input_size; ++i) {
+            itnrn[i]->v.v() += (input[i] * 0.05 + 0.09); // 0.09 is the limit at which it will not explode.
+        }
+
+        for (neuron &_nrn : nrn) _nrn.bp();
+        for (neuron &_nrn : nrn) _nrn.run();
+        
+        ++time();
+    }
+
+
+
+}
+```

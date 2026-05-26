@@ -61,6 +61,7 @@ namespace mtd {
 #include <unordered_map>
 
 namespace std {
+    template <>
     struct hash<mtd::point2<int>> {
         size_t operator()(const mtd::point2<int> &p) const {
             size_t hx = std::hash<int>{}(p.x);
@@ -73,6 +74,7 @@ namespace std {
         }
     };
 
+    template <>
     struct hash<mtd::point3<int>> {
         size_t operator()(const mtd::point3<int> &p) const {
             size_t hx = std::hash<int>{}(p.x);
